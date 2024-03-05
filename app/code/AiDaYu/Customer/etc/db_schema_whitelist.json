@@ -1,0 +1,22 @@
+{
+    "class": {
+        "column": {
+            "class_id": true,
+            "class_name": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "student": {
+        "column": {
+            "student_id": true,
+            "student_name": true,
+            "class_id": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "STUDENT_CLASS_ID_CLASS_CLASS_ID": true
+        }
+    }
+}

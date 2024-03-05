@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Indexer/etc/indexer.xsd">
+    <indexer id="student_indexer_flat" view_id="student_indexer_flat" class="AiDaYu\Customer\Model\Indexer\Student\Flat">
+        <title translate="true">Student Index Flat</title>
+        <description translate="true">Custom Indexer For study</description>
+    </indexer>
+</config>

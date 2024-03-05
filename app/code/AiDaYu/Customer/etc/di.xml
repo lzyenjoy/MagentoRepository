@@ -3,4 +3,47 @@
     <preference for="AiDaYu\Customer\Api\Data\AppUserInterface" type="AiDaYu\Customer\Model\AppUser" />
     <preference for="AiDaYu\Customer\Api\Data\AppUserSearchResultInterface" type="AiDaYu\Customer\Model\AppUserSearchResult" />
     <preference for="AiDaYu\Customer\Api\AppUserRepositoryInterface" type="AiDaYu\Customer\Model\AppUserRepository" />
+    <!--Employee Class-->
+    <type name="AiDaYu\Customer\Model\Employee">
+        <arguments>
+            <argument name="empattribute" xsi:type="array">
+                <item name="name" xsi:type="string">Name</item>
+                <item name="id" xsi:type="string">Id</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!--CustomVirtualEmployee virtualType class for Employee class-->
+    <virtualType name="CustomVirtualEmployee" type="AiDaYu\Customer\Model\Employee">
+    </virtualType>
+
+    <!--FirstEmployee virtualType class for EmpRecord class-->
+    <virtualType name="FirstEmployee" type="AiDaYu\Customer\Model\EmpRecord">
+        <arguments>
+            <argument name="record" xsi:type="array">
+                <item name="name_1" xsi:type="string">Jack</item>
+                <item name="id_1" xsi:type="string">101</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!--SecondEmployee virtualType class for EmpRecord class-->
+    <virtualType name="SecondEmployee" type="AiDaYu\Customer\Model\EmpRecord">
+        <arguments>
+            <argument name="record" xsi:type="array">
+                <item name="name_2" xsi:type="string">Lusi</item>
+                <item name="id_1" xsi:type="string">140</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!--using virtualType classes FirstEmployee and SecondEmployee within di.xml file-->
+    <type name="AiDaYu\Customer\Model\AllRecords">
+        <arguments>
+            <argument name="allRecords" xsi:type="array">
+                <item name="firstEmployee" xsi:type="object">FirstEmployee</item>
+                <item name="secondEmployee" xsi:type="object">SecondEmployee</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

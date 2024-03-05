@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="class" resource="default" engine="innodb" comment="Class Table">
+        <column xsi:type="int" name="class_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Class ID" />
+        <column xsi:type="varchar" name="class_name" nullable="false" length="255" comment="Class Name"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="class_id"/>
+        </constraint>
+    </table>
+
+    <table name="student" resource="default" engine="innodb" comment="Student Table">
+        <column xsi:type="int" name="student_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Student ID"/>
+        <column xsi:type="varchar" name="student_name" nullable="false" length="255" comment="Student Name"/>
+        <column xsi:type="int" name="class_id" padding="10" unsigned="true" nullable="false" comment="Class ID"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="student_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="STUDENT_CLASS_ID_CLASS_CLASS_ID" table="student" column="class_id" referenceTable="class" referenceColumn="class_id" onDelete="CASCADE"/>
+    </table>
+</schema>
