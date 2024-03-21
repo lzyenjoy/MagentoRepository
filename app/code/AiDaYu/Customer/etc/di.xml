@@ -46,4 +46,12 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="AiDaYu\Customer\Model\Indexer\Student\Flat\SkipStaticColumnsProvider">
+        <arguments>
+            <argument name="skipStaticColumns" xsi:type="array">
+                <item name="student_id" xsi:type="string">student_id</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
