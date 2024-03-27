@@ -11,9 +11,9 @@ class SkipStaticColumnsProvider
     private array $skipStaticColumns;
 
     /**
-     * @param $skipStaticColumns
+     * @param array $skipStaticColumns
      */
-    public function __construct($skipStaticColumns = [])
+    public function __construct(array $skipStaticColumns = [])
     {
         $this->skipStaticColumns = $skipStaticColumns;
     }
@@ -21,7 +21,7 @@ class SkipStaticColumnsProvider
     /**
      * @return array
      */
-    public function get()
+    public function get(): array
     {
         return $this->skipStaticColumns;
     }

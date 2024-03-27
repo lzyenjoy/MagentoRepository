@@ -6,6 +6,7 @@ use AiDaYu\Customer\Model\Indexer\Student\Flat\AbstractAction;
 
 class Full extends AbstractAction
 {
+    protected bool $allowTableChanges = true;
 
     /**
      * @param int $store
@@ -15,8 +16,8 @@ class Full extends AbstractAction
     {
         $temporaryTable = $this->addTemporaryTableSuffix($this->getMainStoreTable($store));
         $table = $this->getFlatTableStructure($temporaryTable);
-//        $this->connection->dropTable($temporaryTable);
-//        $this->connection->createTable($table);
+        $this->connection->dropTable($temporaryTable);
+        $this->connection->createTable($table);
         return $this;
     }
 
@@ -40,5 +41,16 @@ class Full extends AbstractAction
     public function reindexAll()
     {
         $this->createTables();
+        if ($this->allowTableChanges) {
+            $this->allowTableChanges = false;
+        }
+        $stores = $this->storeManager->getStores();
+        $this->populateFlatTables($stores);
+    }
+
+    protected function populateFlatTables(array $stores)
+    {
+        foreach ($stores as $store) {
+        }
     }
 }

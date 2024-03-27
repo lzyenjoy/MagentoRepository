@@ -32,7 +32,7 @@ class AbstractAction
      */
     protected StoreManagerInterface $storeManager;
 
-    protected array $columns;
+    protected array $columns = [];
 
     /**
      * Catalog resource helper
@@ -53,7 +53,12 @@ class AbstractAction
      */
     protected array $skipStaticColumns = [];
 
-
+    /**
+     * @param ResourceConnection $resource
+     * @param StoreManagerInterface $storeManager
+     * @param Helper $resourceHelper
+     * @param SkipStaticColumnsProvider|null $skipStaticColumnsProvider
+     */
     public function __construct(
         ResourceConnection $resource,
         StoreManagerInterface $storeManager,
@@ -69,7 +74,76 @@ class AbstractAction
         $this->columns = array_merge($this->getStaticColumns(), $this->getEavColumns());
     }
 
-    protected function getStaticColumns()
+    /**
+     * Get table columns
+     *
+     * @return array
+     */
+    public function getEavColumns(): array
+    {
+        $columns = [];
+        $describe = $this->connection->describeTable(
+            $this->connection->getTableName($this->getTableName('class'))
+        );
+
+        foreach ($describe as $column) {
+            if (in_array($column['COLUMN_NAME'], $this->getSkipStaticColumns())) {
+                continue;
+            }
+            $isUnsigned = '';
+            $options = null;
+            $ddlType = $this->resourceHelper->getDdlTypeByColumnType($column['DATA_TYPE']);
+            $column['DEFAULT'] = $column['DEFAULT'] ? trim($column['DEFAULT'], "' ") : '';
+            switch ($ddlType) {
+                case Table::TYPE_SMALLINT:
+                case Table::TYPE_INTEGER:
+                case Table::TYPE_BIGINT:
+                    $isUnsigned = (bool)$column['UNSIGNED'];
+                    if ($column['DEFAULT'] === '') {
+                        $column['DEFAULT'] = null;
+                    }
+                    $options = null;
+                    if ($column['SCALE'] > 0) {
+                        $ddlType = TABLE::TYPE_DECIMAL;
+                    } else {
+                        break;
+                    }
+                case Table::TYPE_DECIMAL:
+                    $options = $column['PRECISION']. ','.$column['SCALE'];
+                    $isUnsigned = null;
+                    if ($column['DEFAULT'] === '') {
+                        $column['DEFAULT'] = null;
+                    }
+                    break;
+                case Table::TYPE_TEXT:
+                    $options = $column['LENGTH'];
+                    $isUnsigned = null;
+                    break;
+                case Table::TYPE_TIMESTAMP:
+                    $options = null;
+                    $isUnsigned = null;
+                    break;
+                case Table::TYPE_DATETIME:
+                    $isUnsigned = null;
+                    break;
+            }
+            $columns[$column['COLUMN_NAME']] = [
+                'type' => [$ddlType,$options],
+                'unsigned' => $isUnsigned,
+                'nullable' => $column['NULLABLE'],
+                'default' => $column['DEFAULT'] === null ? false : $column['DEFAULT'],
+                'comment' => $column['COLUMN_NAME']
+            ];
+        }
+        return $columns;
+    }
+
+    /**
+     * Get table columns
+     *
+     * @return array
+     */
+    protected function getStaticColumns(): array
     {
         $columns = [];
         $describe = $this->connection->describeTable(
@@ -77,9 +151,9 @@ class AbstractAction
         );
 
         foreach ($describe as $column) {
-            if (in_array($column['COLUMN_NAME'], $this->getSkipStaticColumns())) {
-                continue;
-            }
+//            if (in_array($column['COLUMN_NAME'], $this->getSkipStaticColumns())) {
+//                continue;
+//            }
             $isUnsigned = '';
             $options = null;
             $ddlType = $this->resourceHelper->getDdlTypeByColumnType($column['DATA_TYPE']);
@@ -132,7 +206,7 @@ class AbstractAction
             'default' => 0,
             'comment' => 'Store Id'
         ];
-        print_r($columns);die;
+
         return $columns;
     }
 
@@ -173,6 +247,7 @@ class AbstractAction
         return $this->resource->getTableName($name);
     }
 
+
     /**
      * Add suffix to table name to show it is temporary
      *
@@ -184,6 +259,11 @@ class AbstractAction
         return $tableName . self::TEMPORARY_TABLE_SUFFIX;
     }
 
+    /**
+     * @param $tableName
+     * @return Table
+     * @throws \Zend_Db_Exception
+     */
     protected function getFlatTableStructure($tableName)
     {
         $table = $this->connection->newTable(
@@ -191,8 +271,45 @@ class AbstractAction
         )->setComment(
             'Student Class Flat'
         );
+
+        foreach ($this->getColumns() as $fieldName => $fieldProp) {
+            $default = $fieldProp['default'];
+            if ($fieldProp['type'][0] == Table::TYPE_TIMESTAMP && $default == 'CURRENT_TIMESTAMP') {
+                $default = Table::TIMESTAMP_INIT;
+            }
+            $table->addColumn(
+                $fieldName,
+                $fieldProp['type'][0],
+                $fieldProp['type'][1],
+                [
+                    'nullable' => $fieldProp['nullable'],
+                    'unsigned' => $fieldProp['unsigned'],
+                    'default' => $default,
+                    'primary' => isset($fieldProp['primary']) ? $fieldProp['primary'] : false
+                ],
+                $fieldProp['comment'] != '' ? $fieldProp['comment'] : ucwords(str_replace('_', ' ', $fieldName))
+            );
+        }
+
+        // Adding indexes
+        $table->addIndex(
+            $this->connection->getIndexName($tableName, ['student_id']),
+            ['student_id'],
+            ['type' => 'primary']
+        );
+        $table->addIndex(
+            $this->connection->getIndexName($tableName, ['class_id']),
+            ['class_id'],
+            ['type' => 'index']
+        );
+
+        return $table;
     }
-    public function getColumns()
+
+    /**
+     * @return array
+     */
+    public function getColumns(): array
     {
         return $this->columns;
     }
