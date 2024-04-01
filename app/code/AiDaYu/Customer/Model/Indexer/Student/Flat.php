@@ -2,7 +2,10 @@
 
 namespace AiDaYu\Customer\Model\Indexer\Student;
 
+use AiDaYu\Customer\Model\Indexer\Student\Flat\Action\FullFactory;
+use AiDaYu\Customer\Model\Indexer\Student\Flat\Action\RowsFactory;
 use Magento\Framework\Indexer\CacheContext;
+use Magento\Framework\Indexer\IndexerRegistry;
 
 class Flat implements \Magento\Framework\Indexer\ActionInterface, \Magento\Framework\Mview\ActionInterface
 {
@@ -13,15 +16,31 @@ class Flat implements \Magento\Framework\Indexer\ActionInterface, \Magento\Frame
      */
     private CacheContext $cacheContext;
 
+    protected RowsFactory $rowsActionFactory;
+
+    protected IndexerRegistry $indexerRegistry;
+
     public function __construct(
-        Flat\Action\FullFactory $fullActionFactory
+        FullFactory $fullActionFactory,
+        RowsFactory $rowsActionFactory,
+        IndexerRegistry $indexerRegistry,
     ) {
         $this->fullActionFactory = $fullActionFactory;
+        $this->rowsActionFactory = $rowsActionFactory;
+        $this->indexerRegistry = $indexerRegistry;
     }
 
     public function execute($ids)
     {
         //TODO
+        $indexer = $this->indexerRegistry->get(Flat\State::INDEXER_ID);
+        if($indexer->isInvalid()){
+            return;
+        }
+        /** @var Flat\Action\Rows $action */
+        $action = $this->rowsActionFactory->create();
+        //if($action->is)
+
     }
 
     public function executeFull()

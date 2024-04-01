@@ -313,4 +313,23 @@ class AbstractAction
     {
         return $this->columns;
     }
+
+    /**
+     * Pre pare data
+     *
+     * @param array $data
+     * @return array
+     */
+    public function prepareValuesToInsert(array $data): array
+    {
+        $values = [];
+        foreach (array_keys($this->getColumns()) as $column) {
+            if (isset($data[$column])) {
+                $values[$column] = $data[$column];
+            } else {
+                $values[$column] = null;
+            }
+        }
+        return $values;
+    }
 }
