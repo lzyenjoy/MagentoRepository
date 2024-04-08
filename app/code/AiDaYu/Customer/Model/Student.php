@@ -7,7 +7,7 @@ use Magento\Framework\Model\AbstractExtensibleModel;
 
 class Student extends AbstractExtensibleModel implements StudentInterface
 {
-    public const CACHE_TAG = 'staudent_c';
+    public const CACHE_TAG = 'student_c';
 
     protected function _construct()
     {

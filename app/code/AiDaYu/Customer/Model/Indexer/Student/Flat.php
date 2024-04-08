@@ -9,11 +9,8 @@ use Magento\Framework\Indexer\IndexerRegistry;
 
 class Flat implements \Magento\Framework\Indexer\ActionInterface, \Magento\Framework\Mview\ActionInterface
 {
-    protected $fullActionFactory;
+    protected FullFactory $fullActionFactory;
 
-    /**
-     * @var \Magento\Framework\Indexer\CacheContext
-     */
     private CacheContext $cacheContext;
 
     protected RowsFactory $rowsActionFactory;
@@ -32,15 +29,17 @@ class Flat implements \Magento\Framework\Indexer\ActionInterface, \Magento\Frame
 
     public function execute($ids)
     {
-        //TODO
         $indexer = $this->indexerRegistry->get(Flat\State::INDEXER_ID);
-        if($indexer->isInvalid()){
+        if ($indexer->isInvalid()) {
             return;
         }
         /** @var Flat\Action\Rows $action */
         $action = $this->rowsActionFactory->create();
-        //if($action->is)
-
+        if ($indexer->isWorking()) {
+            $action->reindex($ids, true);
+        }
+        $action->reindex($ids);
+        $this->getCacheContext()->registerEntities(\AiDaYu\Customer\Model\Student::CACHE_TAG, $ids);
     }
 
     public function executeFull()
@@ -51,12 +50,12 @@ class Flat implements \Magento\Framework\Indexer\ActionInterface, \Magento\Frame
 
     public function executeList(array $ids)
     {
-        //TODO
+        $this->execute($ids);
     }
 
     public function executeRow($id)
     {
-        //TODO
+        $this->execute([$id]);
     }
 
     /**

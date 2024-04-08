@@ -2,6 +2,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Mview/etc/mview.xsd">
     <view id="student_indexer_flat" class="AiDaYu\Customer\Model\Indexer\Student\Flat" group="indexer">
         <subscriptions>
+            <table name="student" entity_column="student_id" />
             <table name="class" entity_column="class_id" />
         </subscriptions>
     </view>
